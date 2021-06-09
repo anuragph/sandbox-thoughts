@@ -1,0 +1,1 @@
+A bulletin board app where users can post short messages anonymously.
