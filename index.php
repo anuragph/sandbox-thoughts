@@ -1,9 +1,18 @@
 <?php
-  // Connect to db
-  // Make query
+  
+  include('./config/db_connect.php');
+
+  // Construct query
+  $sql = "SELECT * FROM post
+    ORDER BY post_time DESC";
   // Get result
+  $result = mysqli_query($conn, $sql);
   // Fetch result as array
-  // Loop through results and push to DOM.
+  $posts = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+  mysqli_free_result($result);
+  mysqli_close($conn);
+
 ?>
 
 <!DOCTYPE html>
@@ -42,12 +51,14 @@
     </div>
     
     <!-- Posts -->
-    <div class="post">
-      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum aspernatur magni aut quae tempora voluptatem similique pariatur ratione ipsum voluptate!</p>
-      <p class="text-secondary"><i>Submitted on 13/05/2021</i></p>
-    </div>
-    
-    <hr>
+    <!-- Loop through results and push to DOM. -->
+    <?php foreach($posts as $post) { ?>
+      <div class="post">
+      <p><?php echo $post['post_text']; ?></p>
+      <p class="text-secondary"><i>Submitted on <?php echo $post['post_time']; ?></i></p>
+      </div>
+      <hr>
+    <?php } ?>
     
   </div>
 
