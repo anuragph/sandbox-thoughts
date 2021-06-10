@@ -41,6 +41,7 @@
       if(mysqli_query($conn, $sql)) {
 
         mysqli_close($conn);
+        // Redirect
         header('Location: index.php');
 
       } else {
@@ -48,10 +49,30 @@
       }
     }
   }
-  
-  
-  // redirect
 
+  /* ====
+  Delete post
+  =====
+  */
+  // Check for delete action
+  if(isset($_POST['delete'])) {
+    // Connect to db
+    include('./config/db_connect.php');
+
+    $post_to_delete = mysqli_real_escape_string($conn, $_POST['post_to_delete']);
+
+    $sql = "DELETE FROM post
+      WHERE post_id = $post_to_delete";
+
+    //Delete post from db and check
+    if(mysqli_query($conn, $sql)) {
+      mysqli_close($conn);
+      // Redirect
+      header('Location: index.php');
+    } else {
+      echo "Error: " . mysqli_error($conn);
+    }
+  }
 ?>
 
 <!DOCTYPE html>
@@ -90,11 +111,20 @@
     </div>
     
     <!-- Posts -->
-    <!-- Loop through results and push to DOM. -->
+    <!-- Loop through query results and push to DOM. -->
     <?php foreach($posts as $post) { ?>
       <div class="post">
-      <p><?php echo $post['post_text']; ?></p>
-      <p class="text-secondary"><i>Submitted on <?php echo $post['post_time']; ?></i></p>
+        <p class="text-secondary"><i>Submitted on <?php echo $post['post_time']; ?> : </i></p>        
+        <p><?php echo $post['post_text']; ?></p>
+  
+        
+
+        <!-- Delete post -->  
+        <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'])?>" method="POST" class="form-inline">
+          <input type="hidden" name="post_to_delete" value="<?php echo $post['post_id']; ?>">
+          <input type="submit" class="btn btn-sm btn-light" name="delete" value="Delete">
+        </form>
+
       </div>
       <hr>
     <?php } ?>
