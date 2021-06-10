@@ -1,7 +1,11 @@
 <?php
-  
-  include('./config/db_connect.php');
 
+  /* ===== 
+  Show posts
+  ======= 
+  */
+  // Connect to db
+  include('./config/db_connect.php');
   // Construct query
   $sql = "SELECT * FROM post
     ORDER BY post_time DESC";
@@ -12,6 +16,41 @@
 
   mysqli_free_result($result);
   mysqli_close($conn);
+
+
+  /* =====
+  Submit posts
+  ======
+  */
+  // Check if form submitted
+  if(isset($_POST['submit'])) {
+    $post_text = $_POST['post_text'];
+    
+    // if not empty connect to db and add security to post
+    if(!empty(trim($post_text))) {
+
+      // Connect to db
+      include('./config/db_connect.php');
+
+      $post_text = mysqli_real_escape_string($conn, $post_text);
+      
+      // Construct query
+      $sql = "INSERT INTO post(post_text) VALUES('$post_text')";
+
+      // save to db and check
+      if(mysqli_query($conn, $sql)) {
+
+        mysqli_close($conn);
+        header('Location: index.php');
+
+      } else {
+        echo 'Error: ' . mysqli_error($conn);
+      }
+    }
+  }
+  
+  
+  // redirect
 
 ?>
 
@@ -44,7 +83,7 @@
       <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="POST">
         <div class="form-group">
           <label for="textarea" class="form-label text-light mt-4">Write it down here:</label>
-          <textarea class="form-control" id="textarea" rows="3" maxlength="255" placeholder="Upto 255 characters..."></textarea>
+          <textarea class="form-control" id="textarea" rows="3" maxlength="255" name="post_text" placeholder="Upto 255 characters..."></textarea>
         </div>
         <input class="btn btn-secondary" type="submit" name="submit" value="Submit">
     </form>
